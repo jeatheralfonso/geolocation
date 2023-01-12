@@ -76,15 +76,34 @@ class AppComponent {
     constructor(locationService) {
         this.locationService = locationService;
         this.title = 'geolocation';
+        //for tracking
+        this.HIGH_ACCURACY = true;
+        this.MAX_CACHE_AGE_MILLISECOND = 1;
+        this.MAX_NEW_POSITION_MILLISECOND = 5000;
+        this.trackOptions = {
+            enableHighAccuracy: this.HIGH_ACCURACY,
+            maximumAge: this.MAX_CACHE_AGE_MILLISECOND,
+            timeout: this.MAX_NEW_POSITION_MILLISECOND,
+        };
     }
     ngOnInit() {
-        let location = this.getLocation();
+        //let location = this.getLocation();
+        this.startTracking();
     }
     getLocation() {
-        this.locationService.startTracking().then(pos => {
+        this.locationService.getPosition().then(pos => {
             this.latitude = pos.lat;
             this.longitude = pos.lng;
         });
+    }
+    startTracking() {
+        navigator.geolocation.watchPosition((resp) => {
+            console.log("Leyo leyo");
+            this.latitude = resp.coords.latitude;
+            this.longitude = resp.coords.longitude;
+        }, (err) => {
+            console.log(err);
+        }, this.trackOptions);
     }
 }
 AppComponent.ɵfac = function AppComponent_Factory(t) { return new (t || AppComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_location_service__WEBPACK_IMPORTED_MODULE_1__["LocationService"])); };
@@ -173,15 +192,6 @@ __webpack_require__.r(__webpack_exports__);
 
 class LocationService {
     constructor() {
-        //for tracking
-        this.HIGH_ACCURACY = true;
-        this.MAX_CACHE_AGE_MILLISECOND = 30000;
-        this.MAX_NEW_POSITION_MILLISECOND = 5000;
-        this.trackOptions = {
-            enableHighAccuracy: this.HIGH_ACCURACY,
-            maximumAge: this.MAX_CACHE_AGE_MILLISECOND,
-            timeout: this.MAX_NEW_POSITION_MILLISECOND,
-        };
     }
     getPosition() {
         return new Promise((resolve, reject) => {
@@ -190,15 +200,6 @@ class LocationService {
             }, err => {
                 reject(err);
             });
-        });
-    }
-    startTracking() {
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.watchPosition((resp) => {
-                resolve({ lng: resp.coords.longitude, lat: resp.coords.latitude });
-            }, (err) => {
-                reject(err);
-            }, this.trackOptions);
         });
     }
 }

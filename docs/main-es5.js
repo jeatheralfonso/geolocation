@@ -144,23 +144,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _classCallCheck(this, AppComponent);
 
         this.locationService = locationService;
-        this.title = 'geolocation';
+        this.title = 'geolocation'; //for tracking
+
+        this.HIGH_ACCURACY = true;
+        this.MAX_CACHE_AGE_MILLISECOND = 1;
+        this.MAX_NEW_POSITION_MILLISECOND = 5000;
+        this.trackOptions = {
+          enableHighAccuracy: this.HIGH_ACCURACY,
+          maximumAge: this.MAX_CACHE_AGE_MILLISECOND,
+          timeout: this.MAX_NEW_POSITION_MILLISECOND
+        };
       }
 
       _createClass(AppComponent, [{
         key: "ngOnInit",
         value: function ngOnInit() {
-          var location = this.getLocation();
+          //let location = this.getLocation();
+          this.startTracking();
         }
       }, {
         key: "getLocation",
         value: function getLocation() {
           var _this = this;
 
-          this.locationService.startTracking().then(function (pos) {
+          this.locationService.getPosition().then(function (pos) {
             _this.latitude = pos.lat;
             _this.longitude = pos.lng;
           });
+        }
+      }, {
+        key: "startTracking",
+        value: function startTracking() {
+          var _this2 = this;
+
+          navigator.geolocation.watchPosition(function (resp) {
+            console.log("Leyo leyo");
+            _this2.latitude = resp.coords.latitude;
+            _this2.longitude = resp.coords.longitude;
+          }, function (err) {
+            console.log(err);
+          }, this.trackOptions);
         }
       }]);
 
@@ -339,16 +362,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function () {
       function LocationService() {
         _classCallCheck(this, LocationService);
-
-        //for tracking
-        this.HIGH_ACCURACY = true;
-        this.MAX_CACHE_AGE_MILLISECOND = 30000;
-        this.MAX_NEW_POSITION_MILLISECOND = 5000;
-        this.trackOptions = {
-          enableHighAccuracy: this.HIGH_ACCURACY,
-          maximumAge: this.MAX_CACHE_AGE_MILLISECOND,
-          timeout: this.MAX_NEW_POSITION_MILLISECOND
-        };
       }
 
       _createClass(LocationService, [{
@@ -363,22 +376,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }, function (err) {
               reject(err);
             });
-          });
-        }
-      }, {
-        key: "startTracking",
-        value: function startTracking() {
-          var _this2 = this;
-
-          return new Promise(function (resolve, reject) {
-            navigator.geolocation.watchPosition(function (resp) {
-              resolve({
-                lng: resp.coords.longitude,
-                lat: resp.coords.latitude
-              });
-            }, function (err) {
-              reject(err);
-            }, _this2.trackOptions);
           });
         }
       }]);
