@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
     let location = this.getLocation();
   }
   getLocation() {
-    this.locationService.getPosition().then(pos => {
+    this.locationService.startTracking().then(pos => {
       this.latitude = pos.lat;
       this.longitude = pos.lng;
     });

@@ -121,6 +121,9 @@
               "devServerTarget": "gelocation:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }},
